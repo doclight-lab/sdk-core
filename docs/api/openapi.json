@@ -1,0 +1,371 @@
+{
+  "components": {
+    "parameters": {},
+    "schemas": {
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "IngestBatchRequest": {
+        "properties": {
+          "events": {
+            "items": {
+              "properties": {
+                "agentType": {
+                  "type": "string"
+                },
+                "agentVendor": {
+                  "type": "string"
+                },
+                "apiEndpoint": {
+                  "type": "string"
+                },
+                "context": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "type": "object"
+                },
+                "durationMs": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "environment": {
+                  "type": "string"
+                },
+                "errorMessageRedacted": {
+                  "type": "string"
+                },
+                "errorType": {
+                  "type": "string"
+                },
+                "eventId": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "goal": {
+                  "type": "string"
+                },
+                "httpMethod": {
+                  "enum": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "type": "string"
+                },
+                "inputSchemaHash": {
+                  "type": "string"
+                },
+                "mcpServerName": {
+                  "type": "string"
+                },
+                "metadata": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "type": "object"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "outputSchemaHash": {
+                  "type": "string"
+                },
+                "parentId": {
+                  "type": "string"
+                },
+                "sessionId": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "source": {
+                  "enum": [
+                    "sdk",
+                    "synthetic",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "success",
+                    "failed",
+                    "timeout",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                },
+                "stepName": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "toolName": {
+                  "type": "string"
+                },
+                "traceId": {
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "session_started",
+                    "session_completed",
+                    "agent_detected",
+                    "step_started",
+                    "step_completed",
+                    "tool_listed",
+                    "tool_called",
+                    "resource_read",
+                    "prompt_used",
+                    "api_called",
+                    "error_occurred",
+                    "retry_attempted",
+                    "auth_failed",
+                    "schema_validation_failed",
+                    "rate_limited",
+                    "timeout_occurred"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "eventId",
+                "timestamp",
+                "type",
+                "sessionId"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          },
+          "projectId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "schemaVersion": {
+            "enum": [
+              "1"
+            ],
+            "type": "string"
+          },
+          "sdk": {
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "version": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "projectId",
+          "sdk",
+          "events"
+        ],
+        "type": "object"
+      },
+      "IngestBatchResponse": {
+        "properties": {
+          "accepted": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "errors": {
+            "items": {
+              "properties": {
+                "index": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "index",
+                "reason"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rejected": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "accepted",
+          "rejected"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "description": "Doclight API key",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "SDK event ingest contract for Doclight v1",
+    "title": "Doclight Ingest API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/v1/events/batch": {
+      "post": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-doclight-sdk",
+            "required": true,
+            "schema": {
+              "description": "SDK identifier, e.g. @doclight/node/0.0.0",
+              "example": "@doclight/node/0.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "events": [
+                  {
+                    "eventId": "evt_1",
+                    "sessionId": "sess_1",
+                    "timestamp": "2026-06-11T12:00:00.000Z",
+                    "type": "session_started"
+                  }
+                ],
+                "projectId": "proj_abc",
+                "schemaVersion": "1",
+                "sdk": {
+                  "name": "@doclight/node",
+                  "version": "0.0.0"
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/IngestBatchRequest"
+              }
+            }
+          },
+          "description": "Batch envelope with 1–500 events"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestBatchResponse"
+                }
+              }
+            },
+            "description": "Batch accepted (possibly with per-event rejections)"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request payload"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid bearer token"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Batch too large"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ingest a batch of SDK events"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://ingest.doclight.app"
+    }
+  ]
+}

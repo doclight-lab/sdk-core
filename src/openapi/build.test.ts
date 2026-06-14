@@ -11,7 +11,7 @@ import {
 
 const openapiPath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../../../docs/api/openapi.json",
+  "../../docs/api/openapi.json",
 )
 
 describe("openapi build", () => {

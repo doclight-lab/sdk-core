@@ -6,7 +6,7 @@ import { doclightEventSchema, ingestBatchRequestSchema } from "./index"
 
 const FIXTURE_PATH = join(
   fileURLToPath(new URL(".", import.meta.url)),
-  "../../../../tests/fixtures/contract_events.json",
+  "../../tests/fixtures/contract_events.json",
 )
 
 interface ContractFixture {
