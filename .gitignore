@@ -5,3 +5,4 @@ dist
 yalc.lock
 *.local
 .DS_Store
+.artifacts
