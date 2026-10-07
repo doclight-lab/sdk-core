@@ -1,6 +1,6 @@
 {
   "name": "@doclight/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Event schema, async queue, and transport interface for the Doclight Agent Observability SDK",
   "keywords": [
     "observability",
