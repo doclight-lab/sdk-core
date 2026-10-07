@@ -7,7 +7,7 @@ package metadata (`repository`, `bugs`, `publishConfig`, `engines`), tarball con
 `README.md`, `CHANGELOG.md`, `LICENSE`, `package.json`), every `exports`/`main`/`module`/`types` target,
 ESM `import`, CJS `require`, TypeScript types (`node16` and `bundler` resolution) and all
 `tests/fixtures/contract_events.json` fixtures against the packed build. It prints the tarball SHA-256.
-Pass `--tarball <file>` to verify an already-built artifact instead of packing.
+On success the verified tarball is kept in `.artifacts/` (gitignored); publish that exact file. Pass `--tarball <file>` to verify an already-built artifact instead (its embedded `package.json` is what gets validated).
 
 ## npm ownership and configuration (maintainer, one-time)
 
@@ -23,7 +23,7 @@ Pass `--tarball <file>` to verify an already-built artifact instead of packing.
 1. Contract work (issues #4 and parent coordination) complete and merged; CI green on `main`.
 2. Add a changeset (`pnpm changeset`) and merge the generated "version packages" PR; CHANGELOG/version updated.
 3. The single publisher job (below) runs on that exact commit: install, lint, typecheck, build, test,
-   `verify:package`, then publishes **the verified tarball** (`npm publish <tarball>`), not a rebuild.
+   `verify:package`, then publishes **the verified tarball** (`npm publish .artifacts/<tarball>`), not a rebuild.
 4. Record evidence on issue #5: registry version (`npm view @doclight/core version dist.integrity`), tarball
    SHA-256 from the job log, and a clean install (`npm i @doclight/core` in an empty dir + `node -e "require('@doclight/core')"`).
 
