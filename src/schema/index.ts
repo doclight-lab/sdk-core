@@ -6,8 +6,18 @@ export {
   eventStatusSchema,
   httpMethodSchema,
   metadataRecordSchema,
+  websiteOutcomeSchema,
+  agentIdentitySourceSchema,
+  agentIdentityVerificationSchema,
 } from "./common"
-export { baseEventSchema, doclightEventSchema } from "./events"
+export {
+  agentIdentityEvidenceSchema,
+  baseEventSchema,
+  doclightEventSchema,
+  doclightEventOpenApiSchema,
+  WEBSITE_MAX_DURATION_MS,
+  websiteHostSchema,
+} from "./events"
 export type { DoclightEvent, DoclightEventType } from "./events"
 export {
   ingestBatchRequestSchema,

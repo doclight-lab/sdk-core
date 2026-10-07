@@ -88,7 +88,27 @@ const STRING_EVENT_FIELDS = [
   "errorMessageRedacted",
   "inputSchemaHash",
   "outputSchemaHash",
+  "route",
 ] as const
+
+/**
+ * Fields whose schema forbids brackets: a redacted value must stay valid for
+ * the ingest contract, so use a replacement made of allowed characters.
+ */
+const SAFE_REPLACEMENT_FIELDS = [
+  ["host", "redacted"],
+  ["referrerOrigin", "redacted"],
+  ["correlationId", "REDACTED"],
+] as const
+
+function redactWith(value: string, replacement: string): string {
+  let result = value
+  for (const { pattern } of REDACTION_PATTERNS) {
+    pattern.lastIndex = 0
+    result = result.replace(pattern, replacement)
+  }
+  return result
+}
 
 /**
  * Redacts secrets from event string fields and metadata/context values.
@@ -106,6 +126,20 @@ export function redactEvent(
     const value = redacted[field]
     if (typeof value === "string") {
       ;(redacted as Record<string, unknown>)[field] = redactString(value)
+    }
+  }
+
+  for (const [field, replacement] of SAFE_REPLACEMENT_FIELDS) {
+    const value = redacted[field]
+    if (typeof value === "string") {
+      redacted[field] = redactWith(value, replacement)
+    }
+  }
+
+  if (redacted.agentIdentity?.claimed !== undefined) {
+    redacted.agentIdentity = {
+      ...redacted.agentIdentity,
+      claimed: redactString(redacted.agentIdentity.claimed),
     }
   }
 

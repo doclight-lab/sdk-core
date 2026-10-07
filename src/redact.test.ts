@@ -1,3 +1,4 @@
+import { doclightEventSchema } from "./schema"
 import { describe, expect, it } from "vitest"
 import { REDACTION_PATTERNS, redactEvent, redactString } from "./redact"
 
@@ -63,5 +64,36 @@ describe("redactEvent", () => {
       false,
     )
     expect(event.goal).toBe(raw)
+  })
+})
+
+describe("website_request redaction", () => {
+  const event = {
+    eventId: "e1",
+    timestamp: "2026-06-11T12:00:00.000Z",
+    type: "website_request" as const,
+    host: "example.com",
+    route: "/docs",
+    httpMethod: "GET" as const,
+    outcome: "completed" as const,
+    httpStatus: 200,
+    correlationId: "sk_live_abc123",
+    agentIdentity: {
+      claimed: "bot Bearer abcdef123456",
+      source: "header" as const,
+      verification: "unverified" as const,
+    },
+  }
+
+  it("redacts nested claimed agent identity", () => {
+    const out = redactEvent(event, true)
+    expect(out.agentIdentity?.claimed).not.toContain("abcdef123456")
+    expect(event.agentIdentity.claimed).toContain("abcdef123456")
+  })
+
+  it("keeps redacted correlation ids schema-valid", () => {
+    const out = redactEvent(event, true)
+    expect(out.correlationId).toBe("REDACTED")
+    expect(doclightEventSchema.safeParse(out).success).toBe(true)
   })
 })

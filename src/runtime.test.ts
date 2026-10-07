@@ -359,4 +359,44 @@ describe("EventQueue", () => {
     const drained = q.drain(10)
     expect(drained.map((e) => e.eventId)).toEqual(["e1", "e2"])
   })
+
+  it("accepts website_request without a session and sanitizes the URL", async () => {
+    const transport = new MockTransport()
+    const client = new Doclight(
+      validConfig({
+        sender: transport,
+        transport: { batchSize: 50, flushIntervalMs: 60_000 },
+      }),
+    )
+
+    expect(
+      client.trackWebsiteRequest({
+        url: "/docs?token=1",
+        baseUrl: "https://example.com",
+        httpMethod: "GET",
+        outcome: "completed",
+        httpStatus: 200,
+      }),
+    ).toBe(true)
+    client.track("website_request", {
+      host: "example.com",
+      route: "/x",
+      httpMethod: "GET",
+      outcome: "aborted",
+    })
+    expect(
+      client.trackWebsiteRequest({
+        url: "http://127.0.0.1/x",
+        httpMethod: "GET",
+        outcome: "aborted",
+      }),
+    ).toBe(false)
+    await client.shutdown()
+
+    const events = transport.calls.flatMap((c) => c.events)
+    expect(events).toHaveLength(2)
+    expect(events[0]).toMatchObject({ host: "example.com", route: "/docs" })
+    expect(events[0].sessionId).toBeUndefined()
+    expect(client.getStats().droppedInvalid).toBe(1)
+  })
 })

@@ -54,12 +54,34 @@ Every event requires `eventId`, `timestamp` (ISO 8601), `type`, and `sessionId`.
 | `schema_validation_failed` | Schema validation error |
 | `rate_limited` | Rate limit hit |
 | `timeout_occurred` | Operation timed out |
+| `website_request` | Inbound website request; no `sessionId` or agent task required |
 
 ### Per-type required fields
 
 - `tool_called` requires `toolName`
 - `api_called` requires `apiEndpoint`
 - `error_occurred` requires `errorType`
+
+### Website request events
+
+`website_request` is an additive event type for website telemetry (same `schemaVersion`; existing tool/session events are unchanged).
+
+| Field | Rule |
+| --- | --- |
+| `eventId`, `timestamp` | Required; timestamp is an ISO-8601 UTC datetime |
+| `host` | Required; lowercase hostname with optional port, max 260 chars, IP literals rejected |
+| `route` | Required; path only, starts with `/`, max 512 chars, no query (`?`), fragment (`#`), whitespace or control characters |
+| `httpMethod` | Required |
+| `httpStatus` | Integer 100–599; required when `outcome` is `completed` |
+| `durationMs` | Non-negative integer, at most 24h |
+| `outcome` | Required: `completed` or `aborted` |
+| `agentIdentity` | Optional evidence: `claimed` (max 128), `source` (`user_agent`/`header`/`signature`/`unknown`), `verification` (`unverified`/`verified`/`unknown`). A claimed identity is never verified identity |
+| `referrerOrigin` | Optional; `scheme://host[:port]` only |
+| `correlationId` | Optional; supplied by the caller, `[A-Za-z0-9._:-]`, max 128 |
+
+**Migration note:** `sessionId` is now optional in the event type, but still required (by validation) for every type except `website_request`. TypeScript consumers reading `event.sessionId` as `string` must handle `undefined`.
+
+Use `buildWebsiteRequestEvent()` / `sanitizeWebsiteUrl()` to strip credentials, query strings and fragments and reduce referrers to their origin before sending. Request bodies, cookies, raw IPs and prompts are not part of this contract. Relative URLs need `baseUrl`; raw IP hosts are rejected (the builder returns `undefined`), and a `completed` request must carry `httpStatus`. `client.trackWebsiteRequest(input)` sanitizes and enqueues in one call, and `client.track("website_request", …)` needs no `sessionId`. Redaction also covers `agentIdentity.claimed`; redacted `host`/`referrerOrigin`/`correlationId` use schema-valid placeholders. `docs/api/openapi.json` models the event as `anyOf` variants (session required except `website_request`; `httpStatus` required when `completed`). Canonical fixtures live in `tests/fixtures/contract_events.json` (`website_request_*`) for backend parity tests.
 
 `metadata` and `context` are string-keyed records (values: string, number, or boolean) with at most 50 keys and 1 KB serialized size.
 
