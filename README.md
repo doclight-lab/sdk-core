@@ -135,6 +135,11 @@ Use `buildWebsiteRequestEvent()` / `sanitizeWebsiteUrl()` to strip credentials, 
 
 `environment` defaults to `"production"` at the client level. Pass a custom `sender` transport implementation on the config object; defaults to `NoopTransport`. Set `strict: true` during development to throw on invalid config or events.
 
+## Source and issues
+
+- Source: https://github.com/doclight-lab/sdk-core
+- Issues: https://github.com/doclight-lab/sdk-core/issues
+
 ---
 
 [Full documentation →](https://doclight.app/docs)
