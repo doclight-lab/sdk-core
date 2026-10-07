@@ -17,6 +17,7 @@ export const DOCLIGHT_EVENT_TYPES = [
   "schema_validation_failed",
   "rate_limited",
   "timeout_occurred",
+  "website_request",
 ] as const
 
 export const doclightEventTypeSchema = z.enum(DOCLIGHT_EVENT_TYPES)
@@ -38,6 +39,26 @@ export const eventStatusSchema = z.enum([
   "failed",
   "timeout",
   "cancelled",
+])
+
+export const websiteOutcomeSchema = z.enum(["completed", "aborted"])
+
+export const agentIdentitySourceSchema = z.enum([
+  "user_agent",
+  "header",
+  "signature",
+  "unknown",
+])
+
+/**
+ * "unverified" means the identity is only claimed by the requester.
+ * "verified" must only be set by a backend/edge component that actually
+ * validated a signature or directory entry.
+ */
+export const agentIdentityVerificationSchema = z.enum([
+  "unverified",
+  "verified",
+  "unknown",
 ])
 
 export const dropPolicySchema = z.enum(["drop_oldest", "drop_newest"])

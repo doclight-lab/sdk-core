@@ -88,6 +88,10 @@ const STRING_EVENT_FIELDS = [
   "errorMessageRedacted",
   "inputSchemaHash",
   "outputSchemaHash",
+  "host",
+  "route",
+  "referrerOrigin",
+  "correlationId",
 ] as const
 
 /**
