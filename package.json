@@ -14,9 +14,9 @@
   "homepage": "https://doclight.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/doclight/sdk-core"
+    "url": "https://github.com/doclight-lab/sdk-core"
   },
-  "bugs": "https://github.com/doclight/sdk-core/issues",
+  "bugs": "https://github.com/doclight-lab/sdk-core/issues",
   "publishConfig": {
     "access": "public"
   },
@@ -61,6 +61,7 @@
     "test": "vitest run",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
+    "verify:package": "node scripts/verify-package.mjs",
     "generate:openapi": "tsx src/openapi/generate.ts"
   }
 }
