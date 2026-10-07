@@ -57,4 +57,29 @@ describe("website sanitization", () => {
     expect(event?.route?.length).toBe(512)
     expect(doclightEventSchema.safeParse(event).success).toBe(true)
   })
+
+  it("rejects IP literal hosts", () => {
+    expect(sanitizeWebsiteUrl("http://127.0.0.1/path")).toBeUndefined()
+    expect(sanitizeWebsiteUrl("http://[::1]/path")).toBeUndefined()
+    expect(
+      buildWebsiteRequestEvent({ ...base, url: "http://10.0.0.1:8080/x" }),
+    ).toBeUndefined()
+  })
+
+  it("resolves relative URLs against baseUrl", () => {
+    expect(sanitizeWebsiteUrl("/docs?x=1", "https://Example.com")).toEqual({
+      host: "example.com",
+      route: "/docs",
+    })
+    expect(sanitizeWebsiteUrl("/docs?x=1")).toBeUndefined()
+  })
+
+  it("never returns an event missing the status of a completed request", () => {
+    const event = buildWebsiteRequestEvent({
+      ...base,
+      httpStatus: undefined,
+      url: "https://example.com/",
+    } as never)
+    expect(event).toBeUndefined()
+  })
 })

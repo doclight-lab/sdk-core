@@ -13,6 +13,7 @@ import {
 
 type EventStatus = "success" | "failed" | "timeout" | "cancelled"
 import type { SdkIdentity } from "./sdk"
+import { buildWebsiteRequestEvent, type WebsiteRequestInput } from "./website"
 import { NoopTransport, type Transport } from "./transport"
 
 export type { SdkIdentity } from "./sdk"
@@ -36,6 +37,11 @@ type TrackFields = Omit<
   Partial<DoclightEvent>,
   "eventId" | "timestamp" | "type" | "source" | "environment"
 > & { sessionId: string }
+
+/** website_request events need no session/agent task. */
+type WebsiteTrackFields = Omit<TrackFields, "sessionId"> & {
+  sessionId?: string
+}
 
 export interface TrackToolCallFields {
   sessionId: string
@@ -115,7 +121,10 @@ export class Doclight {
     this.flusher.start()
   }
 
-  track(type: DoclightEventType, fields: TrackFields): void {
+  track<T extends DoclightEventType>(
+    type: T,
+    fields: T extends "website_request" ? WebsiteTrackFields : TrackFields,
+  ): void {
     if (this.disabled || this.shutDown) return
 
     try {
@@ -155,6 +164,37 @@ export class Doclight {
       if (this.strict) throw err
       this.warnOnce("track", `track() failed: ${String(err)}`)
     }
+  }
+
+  /**
+   * Sanitizes (credentials/query/fragment stripped) and enqueues a
+   * website_request event. Returns false when the URL cannot be reduced to a
+   * safe host/route, in which case nothing is enqueued.
+   */
+  trackWebsiteRequest(
+    input: Omit<WebsiteRequestInput, "eventId" | "timestamp">,
+  ): boolean {
+    const event = buildWebsiteRequestEvent({
+      ...input,
+      eventId: randomUUID(),
+      timestamp: new Date().toISOString(),
+    } as WebsiteRequestInput)
+    if (!event) {
+      this.stats.droppedInvalid++
+      return false
+    }
+    const fields: Record<string, unknown> = { ...event }
+    for (const key of [
+      "eventId",
+      "timestamp",
+      "type",
+      "source",
+      "environment",
+    ]) {
+      delete fields[key]
+    }
+    this.track("website_request", fields as WebsiteTrackFields)
+    return true
   }
 
   startSession(

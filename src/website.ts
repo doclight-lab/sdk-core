@@ -1,14 +1,21 @@
-import type { DoclightEvent } from "./schema"
+import {
+  doclightEventSchema,
+  websiteHostSchema,
+  type DoclightEvent,
+} from "./schema"
 
-export interface WebsiteRequestInput {
+interface WebsiteRequestInputCommon {
   eventId: string
   timestamp: string
-  /** Full or relative URL; credentials, query and fragment are stripped. */
+  /**
+   * Absolute URL, or a relative URL (e.g. `/docs?x=1`) together with
+   * `baseUrl`. Credentials, query and fragment are stripped.
+   */
   url: string
+  /** Absolute base (e.g. `https://example.com`) for relative `url` values. */
+  baseUrl?: string
   httpMethod: NonNullable<DoclightEvent["httpMethod"]>
-  httpStatus?: number
   durationMs?: number
-  outcome: "completed" | "aborted"
   /** Claimed agent identity (e.g. a User-Agent token). Never verified here. */
   claimedAgent?: string
   agentSource?: "user_agent" | "header" | "signature" | "unknown"
@@ -17,16 +24,26 @@ export interface WebsiteRequestInput {
   correlationId?: string
 }
 
+/** A completed request must carry its HTTP status; an aborted one may not. */
+export type WebsiteRequestInput = WebsiteRequestInputCommon &
+  (
+    | { outcome: "completed"; httpStatus: number }
+    | { outcome: "aborted"; httpStatus?: number }
+  )
+
 const MAX_ROUTE = 512
 const MAX_CLAIMED = 128
 
 /** Returns host (lowercase, with non-default port) and path only. */
 export function sanitizeWebsiteUrl(
   raw: string,
+  base?: string,
 ): { host: string; route: string } | undefined {
   try {
-    const url = new URL(raw)
+    const url = new URL(raw, base)
     if (url.protocol !== "http:" && url.protocol !== "https:") return undefined
+    // Raw IP literals (IPv4/IPv6) and other invalid hosts are not allowed.
+    if (!websiteHostSchema.safeParse(url.host).success) return undefined
     return { host: url.host, route: url.pathname.slice(0, MAX_ROUTE) || "/" }
   } catch {
     return undefined
@@ -52,7 +69,7 @@ export function sanitizeReferrerOrigin(raw: string): string | undefined {
 export function buildWebsiteRequestEvent(
   input: WebsiteRequestInput,
 ): DoclightEvent | undefined {
-  const target = sanitizeWebsiteUrl(input.url)
+  const target = sanitizeWebsiteUrl(input.url, input.baseUrl)
   if (!target) return undefined
 
   const claimed = input.claimedAgent?.trim().slice(0, MAX_CLAIMED)
@@ -60,7 +77,7 @@ export function buildWebsiteRequestEvent(
     ? sanitizeReferrerOrigin(input.referrer)
     : undefined
 
-  return {
+  const event: DoclightEvent = {
     eventId: input.eventId,
     timestamp: input.timestamp,
     type: "website_request",
@@ -81,4 +98,8 @@ export function buildWebsiteRequestEvent(
     ...(referrerOrigin && { referrerOrigin }),
     ...(input.correlationId && { correlationId: input.correlationId }),
   }
+
+  // Never hand back an event the ingest contract would reject.
+  const parsed = doclightEventSchema.safeParse(event)
+  return parsed.success ? parsed.data : undefined
 }

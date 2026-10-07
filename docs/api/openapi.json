@@ -17,158 +17,633 @@
         "properties": {
           "events": {
             "items": {
-              "properties": {
-                "agentType": {
-                  "type": "string"
-                },
-                "agentVendor": {
-                  "type": "string"
-                },
-                "apiEndpoint": {
-                  "type": "string"
-                },
-                "context": {
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
+              "anyOf": [
+                {
+                  "properties": {
+                    "agentIdentity": {
+                      "properties": {
+                        "claimed": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "user_agent",
+                            "header",
+                            "signature",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        },
+                        "verification": {
+                          "enum": [
+                            "unverified",
+                            "verified",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        }
                       },
-                      {
-                        "type": "number"
+                      "required": [
+                        "source",
+                        "verification"
+                      ],
+                      "type": "object"
+                    },
+                    "agentType": {
+                      "type": "string"
+                    },
+                    "agentVendor": {
+                      "type": "string"
+                    },
+                    "apiEndpoint": {
+                      "type": "string"
+                    },
+                    "context": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
                       },
-                      {
-                        "type": "boolean"
-                      }
-                    ]
+                      "type": "object"
+                    },
+                    "correlationId": {
+                      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+                      "type": "string"
+                    },
+                    "durationMs": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "errorMessageRedacted": {
+                      "type": "string"
+                    },
+                    "errorType": {
+                      "type": "string"
+                    },
+                    "eventId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "goal": {
+                      "type": "string"
+                    },
+                    "host": {
+                      "maxLength": 260,
+                      "pattern": "^(?!\\d+(?:\\.\\d+){3}(?::\\d+)?$)[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "httpMethod": {
+                      "enum": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "HEAD",
+                        "OPTIONS"
+                      ],
+                      "type": "string"
+                    },
+                    "httpStatus": {
+                      "maximum": 599,
+                      "minimum": 100,
+                      "type": "integer"
+                    },
+                    "inputSchemaHash": {
+                      "type": "string"
+                    },
+                    "mcpServerName": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "type": "object"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "outcome": {
+                      "enum": [
+                        "completed",
+                        "aborted"
+                      ],
+                      "type": "string"
+                    },
+                    "outputSchemaHash": {
+                      "type": "string"
+                    },
+                    "parentId": {
+                      "type": "string"
+                    },
+                    "referrerOrigin": {
+                      "maxLength": 270,
+                      "pattern": "^https?:\\/\\/[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "route": {
+                      "maxLength": 512,
+                      "pattern": "^\\/[^?#\\s]*$",
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "sdk",
+                        "synthetic",
+                        "manual"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "success",
+                        "failed",
+                        "timeout",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    },
+                    "stepName": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "toolName": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "session_started",
+                        "session_completed",
+                        "agent_detected",
+                        "step_started",
+                        "step_completed",
+                        "tool_listed",
+                        "tool_called",
+                        "resource_read",
+                        "prompt_used",
+                        "api_called",
+                        "error_occurred",
+                        "retry_attempted",
+                        "auth_failed",
+                        "schema_validation_failed",
+                        "rate_limited",
+                        "timeout_occurred"
+                      ],
+                      "type": "string"
+                    }
                   },
+                  "required": [
+                    "eventId",
+                    "timestamp",
+                    "type",
+                    "sessionId"
+                  ],
                   "type": "object"
                 },
-                "durationMs": {
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "environment": {
-                  "type": "string"
-                },
-                "errorMessageRedacted": {
-                  "type": "string"
-                },
-                "errorType": {
-                  "type": "string"
-                },
-                "eventId": {
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "goal": {
-                  "type": "string"
-                },
-                "httpMethod": {
-                  "enum": [
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "PATCH",
-                    "DELETE",
-                    "HEAD",
-                    "OPTIONS"
-                  ],
-                  "type": "string"
-                },
-                "inputSchemaHash": {
-                  "type": "string"
-                },
-                "mcpServerName": {
-                  "type": "string"
-                },
-                "metadata": {
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
+                {
+                  "properties": {
+                    "agentIdentity": {
+                      "properties": {
+                        "claimed": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "user_agent",
+                            "header",
+                            "signature",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        },
+                        "verification": {
+                          "enum": [
+                            "unverified",
+                            "verified",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        }
                       },
-                      {
-                        "type": "number"
+                      "required": [
+                        "source",
+                        "verification"
+                      ],
+                      "type": "object"
+                    },
+                    "agentType": {
+                      "type": "string"
+                    },
+                    "agentVendor": {
+                      "type": "string"
+                    },
+                    "apiEndpoint": {
+                      "type": "string"
+                    },
+                    "context": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
                       },
-                      {
-                        "type": "boolean"
-                      }
-                    ]
+                      "type": "object"
+                    },
+                    "correlationId": {
+                      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+                      "type": "string"
+                    },
+                    "durationMs": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "errorMessageRedacted": {
+                      "type": "string"
+                    },
+                    "errorType": {
+                      "type": "string"
+                    },
+                    "eventId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "goal": {
+                      "type": "string"
+                    },
+                    "host": {
+                      "maxLength": 260,
+                      "pattern": "^(?!\\d+(?:\\.\\d+){3}(?::\\d+)?$)[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "httpMethod": {
+                      "enum": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "HEAD",
+                        "OPTIONS"
+                      ],
+                      "type": "string"
+                    },
+                    "httpStatus": {
+                      "maximum": 599,
+                      "minimum": 100,
+                      "type": "integer"
+                    },
+                    "inputSchemaHash": {
+                      "type": "string"
+                    },
+                    "mcpServerName": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "type": "object"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "outcome": {
+                      "enum": [
+                        "completed"
+                      ],
+                      "type": "string"
+                    },
+                    "outputSchemaHash": {
+                      "type": "string"
+                    },
+                    "parentId": {
+                      "type": "string"
+                    },
+                    "referrerOrigin": {
+                      "maxLength": 270,
+                      "pattern": "^https?:\\/\\/[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "route": {
+                      "maxLength": 512,
+                      "pattern": "^\\/[^?#\\s]*$",
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "sdk",
+                        "synthetic",
+                        "manual"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "success",
+                        "failed",
+                        "timeout",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    },
+                    "stepName": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "toolName": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "website_request"
+                      ],
+                      "type": "string"
+                    }
                   },
+                  "required": [
+                    "eventId",
+                    "timestamp",
+                    "type",
+                    "httpMethod",
+                    "host",
+                    "route",
+                    "httpStatus",
+                    "outcome"
+                  ],
                   "type": "object"
                 },
-                "model": {
-                  "type": "string"
-                },
-                "outputSchemaHash": {
-                  "type": "string"
-                },
-                "parentId": {
-                  "type": "string"
-                },
-                "sessionId": {
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "source": {
-                  "enum": [
-                    "sdk",
-                    "synthetic",
-                    "manual"
+                {
+                  "properties": {
+                    "agentIdentity": {
+                      "properties": {
+                        "claimed": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "user_agent",
+                            "header",
+                            "signature",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        },
+                        "verification": {
+                          "enum": [
+                            "unverified",
+                            "verified",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "source",
+                        "verification"
+                      ],
+                      "type": "object"
+                    },
+                    "agentType": {
+                      "type": "string"
+                    },
+                    "agentVendor": {
+                      "type": "string"
+                    },
+                    "apiEndpoint": {
+                      "type": "string"
+                    },
+                    "context": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "type": "object"
+                    },
+                    "correlationId": {
+                      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+                      "type": "string"
+                    },
+                    "durationMs": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "environment": {
+                      "type": "string"
+                    },
+                    "errorMessageRedacted": {
+                      "type": "string"
+                    },
+                    "errorType": {
+                      "type": "string"
+                    },
+                    "eventId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "goal": {
+                      "type": "string"
+                    },
+                    "host": {
+                      "maxLength": 260,
+                      "pattern": "^(?!\\d+(?:\\.\\d+){3}(?::\\d+)?$)[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "httpMethod": {
+                      "enum": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "HEAD",
+                        "OPTIONS"
+                      ],
+                      "type": "string"
+                    },
+                    "httpStatus": {
+                      "maximum": 599,
+                      "minimum": 100,
+                      "type": "integer"
+                    },
+                    "inputSchemaHash": {
+                      "type": "string"
+                    },
+                    "mcpServerName": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "type": "object"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "outcome": {
+                      "enum": [
+                        "aborted"
+                      ],
+                      "type": "string"
+                    },
+                    "outputSchemaHash": {
+                      "type": "string"
+                    },
+                    "parentId": {
+                      "type": "string"
+                    },
+                    "referrerOrigin": {
+                      "maxLength": 270,
+                      "pattern": "^https?:\\/\\/[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?(?::\\d{1,5})?$",
+                      "type": "string"
+                    },
+                    "route": {
+                      "maxLength": 512,
+                      "pattern": "^\\/[^?#\\s]*$",
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "sdk",
+                        "synthetic",
+                        "manual"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "success",
+                        "failed",
+                        "timeout",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    },
+                    "stepName": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "toolName": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "website_request"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "eventId",
+                    "timestamp",
+                    "type",
+                    "httpMethod",
+                    "host",
+                    "route",
+                    "outcome"
                   ],
-                  "type": "string"
-                },
-                "status": {
-                  "enum": [
-                    "success",
-                    "failed",
-                    "timeout",
-                    "cancelled"
-                  ],
-                  "type": "string"
-                },
-                "stepName": {
-                  "type": "string"
-                },
-                "timestamp": {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                "toolName": {
-                  "type": "string"
-                },
-                "traceId": {
-                  "type": "string"
-                },
-                "type": {
-                  "enum": [
-                    "session_started",
-                    "session_completed",
-                    "agent_detected",
-                    "step_started",
-                    "step_completed",
-                    "tool_listed",
-                    "tool_called",
-                    "resource_read",
-                    "prompt_used",
-                    "api_called",
-                    "error_occurred",
-                    "retry_attempted",
-                    "auth_failed",
-                    "schema_validation_failed",
-                    "rate_limited",
-                    "timeout_occurred"
-                  ],
-                  "type": "string"
+                  "type": "object"
                 }
-              },
-              "required": [
-                "eventId",
-                "timestamp",
-                "type",
-                "sessionId"
-              ],
-              "type": "object"
+              ]
             },
             "maxItems": 500,
             "minItems": 1,

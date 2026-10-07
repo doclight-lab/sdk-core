@@ -14,7 +14,9 @@ export {
   agentIdentityEvidenceSchema,
   baseEventSchema,
   doclightEventSchema,
+  doclightEventOpenApiSchema,
   WEBSITE_MAX_DURATION_MS,
+  websiteHostSchema,
 } from "./events"
 export type { DoclightEvent, DoclightEventType } from "./events"
 export {

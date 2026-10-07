@@ -81,7 +81,7 @@ Every event requires `eventId`, `timestamp` (ISO 8601), `type`, and `sessionId`.
 
 **Migration note:** `sessionId` is now optional in the event type, but still required (by validation) for every type except `website_request`. TypeScript consumers reading `event.sessionId` as `string` must handle `undefined`.
 
-Use `buildWebsiteRequestEvent()` / `sanitizeWebsiteUrl()` to strip credentials, query strings and fragments and reduce referrers to their origin before sending. Request bodies, cookies, raw IPs and prompts are not part of this contract. Canonical fixtures live in `tests/fixtures/contract_events.json` (`website_request_*`) for backend parity tests.
+Use `buildWebsiteRequestEvent()` / `sanitizeWebsiteUrl()` to strip credentials, query strings and fragments and reduce referrers to their origin before sending. Request bodies, cookies, raw IPs and prompts are not part of this contract. Relative URLs need `baseUrl`; raw IP hosts are rejected (the builder returns `undefined`), and a `completed` request must carry `httpStatus`. `client.trackWebsiteRequest(input)` sanitizes and enqueues in one call, and `client.track("website_request", …)` needs no `sessionId`. Redaction also covers `agentIdentity.claimed`; redacted `host`/`referrerOrigin`/`correlationId` use schema-valid placeholders. `docs/api/openapi.json` models the event as `anyOf` variants (session required except `website_request`; `httpStatus` required when `completed`). Canonical fixtures live in `tests/fixtures/contract_events.json` (`website_request_*`) for backend parity tests.
 
 `metadata` and `context` are string-keyed records (values: string, number, or boolean) with at most 50 keys and 1 KB serialized size.
 

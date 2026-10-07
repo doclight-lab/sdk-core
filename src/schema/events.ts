@@ -1,5 +1,6 @@
 import { z } from "zod"
 import {
+  DOCLIGHT_EVENT_TYPES,
   agentIdentitySourceSchema,
   agentIdentityVerificationSchema,
   doclightEventTypeSchema,
@@ -86,6 +87,45 @@ export const baseEventSchema = z.object({
   metadata: metadataRecordSchema.optional(),
   context: metadataRecordSchema.optional(),
 })
+
+/**
+ * Structural (refinement-free) event variants. Runtime validation uses
+ * doclightEventSchema below; these exist so the generated OpenAPI document
+ * can express "sessionId required except for website_request" and the
+ * completed/aborted status rule with oneOf instead of custom refinements.
+ */
+const standardEventSchema = baseEventSchema.extend({
+  type: z.enum(
+    DOCLIGHT_EVENT_TYPES.filter((t) => t !== "website_request") as [
+      Exclude<(typeof DOCLIGHT_EVENT_TYPES)[number], "website_request">,
+      ...Exclude<(typeof DOCLIGHT_EVENT_TYPES)[number], "website_request">[],
+    ],
+  ),
+  sessionId: z.string().min(1),
+})
+
+const websiteRequestBase = baseEventSchema.extend({
+  type: z.literal("website_request"),
+  host: websiteHostSchema,
+  route: websiteRouteSchema,
+  httpMethod: httpMethodSchema,
+  durationMs: z.number().int().nonnegative().max(WEBSITE_MAX_DURATION_MS).optional(),
+})
+
+const websiteCompletedEventSchema = websiteRequestBase.extend({
+  outcome: z.literal("completed"),
+  httpStatus: z.number().int().min(100).max(599),
+})
+
+const websiteAbortedEventSchema = websiteRequestBase.extend({
+  outcome: z.literal("aborted"),
+})
+
+export const doclightEventOpenApiSchema = z.union([
+  standardEventSchema,
+  websiteCompletedEventSchema,
+  websiteAbortedEventSchema,
+])
 
 export const doclightEventSchema = baseEventSchema.superRefine((event, ctx) => {
   if (event.type !== "website_request" && !event.sessionId) {

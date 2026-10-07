@@ -57,3 +57,19 @@ describe("openapi build", () => {
     expect(result.success).toBe(true)
   })
 })
+
+describe("website_request OpenAPI structure", () => {
+  it("requires sessionId for standard events but not website_request", () => {
+    const doc = JSON.stringify(buildOpenApiDocument())
+    expect(doc).toContain("website_request")
+    const schemas = (buildOpenApiDocument() as {
+      components: { schemas: Record<string, { properties: { events: { items: { anyOf?: { required?: string[]; properties: { type: { enum?: string[] } } }[] } } } }> }
+    }).components.schemas
+    const variants = schemas.IngestBatchRequest.properties.events.items.anyOf ?? []
+    expect(variants.length).toBe(3)
+    for (const v of variants) {
+      const isWebsite = v.properties.type.enum?.[0] === "website_request"
+      expect(v.required?.includes("sessionId") ?? false).toBe(!isWebsite)
+    }
+  })
+})
