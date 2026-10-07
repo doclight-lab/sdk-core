@@ -5,7 +5,7 @@ import { buildOpenApiDocument, sortKeys } from "./build"
 
 const outPath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../../../docs/api/openapi.json",
+  "../../docs/api/openapi.json",
 )
 
 mkdirSync(dirname(outPath), { recursive: true })

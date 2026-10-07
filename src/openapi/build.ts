@@ -6,6 +6,7 @@ import {
 import { z } from "zod"
 import {
   DEFAULT_INGEST_ENDPOINT,
+  doclightEventOpenApiSchema,
   INGEST_BATCH_PATH,
   ingestBatchRequestSchema,
   ingestBatchResponseSchema,
@@ -35,6 +36,11 @@ export const EXAMPLE_INGEST_BATCH_REQUEST = {
   ],
 } as const
 
+/** Same envelope as ingestBatchRequestSchema, with structural event variants. */
+const openApiIngestBatchRequestSchema = ingestBatchRequestSchema.extend({
+  events: z.array(doclightEventOpenApiSchema).min(1).max(500),
+})
+
 export function sortKeys<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map((item) => sortKeys(item)) as T
@@ -54,7 +60,7 @@ export function buildOpenApiDocument(): Record<string, unknown> {
 
   const IngestBatchRequest = registry.register(
     "IngestBatchRequest",
-    ingestBatchRequestSchema,
+    openApiIngestBatchRequestSchema,
   )
   const IngestBatchResponse = registry.register(
     "IngestBatchResponse",

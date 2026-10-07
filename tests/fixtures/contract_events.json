@@ -6506,6 +6506,269 @@
         ]
       },
       "expect": "reject"
+    },
+    {
+      "name": "website_request_success",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "durationMs": 42,
+        "outcome": "completed",
+        "agentIdentity": {
+          "claimed": "GPTBot/1.0",
+          "source": "user_agent",
+          "verification": "unverified"
+        },
+        "referrerOrigin": "https://search.example.org"
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_failure",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 503,
+        "durationMs": 1200,
+        "outcome": "completed",
+        "agentIdentity": {
+          "claimed": "GPTBot/1.0",
+          "source": "user_agent",
+          "verification": "unverified"
+        }
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_abort",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "durationMs": 300,
+        "outcome": "aborted",
+        "agentIdentity": {
+          "claimed": "GPTBot/1.0",
+          "source": "user_agent",
+          "verification": "unverified"
+        }
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_unknown_agent",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 404,
+        "outcome": "completed",
+        "agentIdentity": {
+          "source": "unknown",
+          "verification": "unknown"
+        }
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_correlated",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed",
+        "agentIdentity": {
+          "claimed": "GPTBot/1.0",
+          "source": "user_agent",
+          "verification": "unverified"
+        },
+        "correlationId": "corr_abc-123"
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_no_session_required",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "website_request_query_in_route_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/a?token=x",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_fragment_in_route_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/a#frag",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_credentials_in_host_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "user:pw@example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_ip_host_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "203.0.113.7",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_referrer_path_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "referrerOrigin": "https://a.example/path?x=1",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_status_out_of_range_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 700,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_completed_requires_status",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_missing_route_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "website_request",
+        "host": "example.com",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "website_request_bad_timestamp_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "evt_w1",
+        "timestamp": "not-a-time",
+        "type": "website_request",
+        "host": "example.com",
+        "route": "/docs/intro",
+        "httpMethod": "GET",
+        "httpStatus": 200,
+        "outcome": "completed"
+      },
+      "expect": "reject"
+    },
+    {
+      "name": "tool_called_without_session_rejected",
+      "schema": "event",
+      "payload": {
+        "eventId": "e",
+        "timestamp": "2026-06-11T12:00:00.000Z",
+        "type": "tool_called",
+        "toolName": "x"
+      },
+      "expect": "reject"
     }
   ]
 }
