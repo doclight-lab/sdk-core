@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Migrate release management from Changesets to Release Please; add `scripts/release-guard.mjs` and `pnpm release:check`.
 - Add `pnpm verify:package` packed-artifact validation and `docs/RELEASING.md`; fix repository metadata to `doclight-lab/sdk-core`.
 - Add `website_request` event type, sanitizer and fixtures.
 - Fix `generate:openapi` output path.

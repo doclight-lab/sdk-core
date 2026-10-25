@@ -46,7 +46,6 @@
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "7.3.4",
-    "@changesets/cli": "^2.27.10",
     "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.2",
     "eslint": "^9.17.0",
@@ -62,6 +61,7 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "verify:package": "node scripts/verify-package.mjs",
+    "release:check": "node scripts/release-guard.mjs check",
     "generate:openapi": "tsx src/openapi/generate.ts"
   }
 }
