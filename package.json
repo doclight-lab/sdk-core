@@ -62,6 +62,7 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "verify:package": "node scripts/verify-package.mjs",
+    "release:check": "node scripts/release-guard.mjs check",
     "generate:openapi": "tsx src/openapi/generate.ts"
   }
 }
