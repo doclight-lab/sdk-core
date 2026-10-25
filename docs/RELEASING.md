@@ -26,6 +26,11 @@ opens/updates a release PR (version, `CHANGELOG.md`, tag `vX.Y.Z`). `pnpm releas
 and `node scripts/release-guard.mjs registry <version> [integrity]` prints `publish`/`skip` and fails on a conflicting
 published version or registry outage (never treated as permission to overwrite).
 
+**Changesets removal is deferred.** The protected `.github/workflows/release.yml` still runs `changesets/action` with
+`pnpm changeset publish`, so `@changesets/cli` and `.changeset/config.json` are intentionally retained in this PR. In the
+same trusted-maintainer change that applies the workflow patch below, also delete `.changeset/`, drop `@changesets/cli`
+from `devDependencies`, and refresh `pnpm-lock.yaml`.
+
 ## First release: 0.2.0
 
 Registry history was inspected: only `0.1.0` is published (`0.1.1` in `package.json` was never published). Target is
